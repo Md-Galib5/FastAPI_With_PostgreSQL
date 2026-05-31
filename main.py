@@ -53,6 +53,43 @@ def get_tours():
 
     return {"data": data}
 
+
 @app.get("/")
 def home():
     return {"message": "FastAPI is working"}
+
+
+@app.get("/tour/{id}")
+def tour_by_id(id: int):
+
+    conn, cursor = get_db()
+
+    cursor.execute(
+        """
+        SELECT * FROM tour WHERE id = %s
+        """,
+        (id,)
+    )
+    tour = cursor.fetchone()
+    conn.close()
+
+    return {"data": tour}
+
+
+@app.delete("/tour/{id}")
+def delete_by_id(id: int):
+
+    conn, cursor = get_db()
+
+    cursor.execute(
+        """
+        DELETE FROM tour WHERE id = %s
+        """,
+        (id,)
+    )
+
+    conn.commit()
+
+    conn.close()
+
+    return {"message": f"Tour with id {id} deleted successfully"}
