@@ -1,9 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Depends
 from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from . import model
+from sqlalchemy.orm import Session
+from .database import engine, get_db
 
 app = FastAPI()
+
+model.Base.metadata.create_all(bind=engine)
+
 
 class Travel(BaseModel):
     country: str
@@ -116,3 +122,8 @@ def update_by_id(id: int, post: Travel):
     conn.close()
 
     return {"message": "Tour updated successfully"}
+
+
+@app.get("/coursealchemy")
+def country(db: Session = Depends(get_db)):
+    return {"message": "sqlalchemy orm working"}
