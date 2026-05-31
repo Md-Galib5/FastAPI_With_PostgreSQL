@@ -93,3 +93,26 @@ def delete_by_id(id: int):
     conn.close()
 
     return {"message": f"Tour with id {id} deleted successfully"}
+
+
+@app.put("/tour/{id}")
+def update_by_id(id: int, post: Travel):
+
+    conn, cursor = get_db()
+
+    cursor.execute(
+        """
+        UPDATE tour
+        SET country = %s,
+            city = %s,
+            duration = %s,
+            cost = %s
+        WHERE id = %s
+        """,
+        (post.country, post.city, post.duration, post.cost, id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return {"message": "Tour updated successfully"}
