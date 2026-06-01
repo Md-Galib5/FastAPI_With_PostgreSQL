@@ -12,12 +12,12 @@ model.Base.metadata.create_all(bind=engine)
 
 
 class Travel(BaseModel):
-    country: str
+    name: str
     city: str
     duration: int
     cost: int
 
-def get_db():
+def get_psycopg_db():
     conn = psycopg2.connect(
         host="localhost",
         database="Tour",
@@ -30,7 +30,7 @@ def get_db():
 
 @app.post("/tour")
 def create_tour(post: Travel):
-    conn, cursor = get_db()
+    conn, cursor = get_psycopg_db()
 
     cursor.execute(
         """
@@ -47,10 +47,26 @@ def create_tour(post: Travel):
 
     return {"data": new_data}
 
+
+@app.post("/SQLtour")
+def post_tour(post : Travel,db:Session = Depends(get_db)):
+    new_tour = model.Travel(
+        name = post.name,
+        city = post.city,
+        duration = post.duration,
+        cost = post.cost
+    )
+    db.add(new_tour)
+    db.commit()
+    db.refresh(new_tour)
+    return {"Tour" : new_tour}
+
+
+
 @app.get("/tour")
 def get_tours():
 
-    conn, cursor = get_db()
+    conn, cursor = get_psycopg_db()
 
     cursor.execute("SELECT * FROM tour")
     data = cursor.fetchall()
@@ -68,7 +84,7 @@ def home():
 @app.get("/tour/{id}")
 def tour_by_id(id: int):
 
-    conn, cursor = get_db()
+    conn, cursor = get_psycopg_db()
 
     cursor.execute(
         """
@@ -85,7 +101,7 @@ def tour_by_id(id: int):
 @app.delete("/tour/{id}")
 def delete_by_id(id: int):
 
-    conn, cursor = get_db()
+    conn, cursor = get_psycopg_db()
 
     cursor.execute(
         """
@@ -104,7 +120,7 @@ def delete_by_id(id: int):
 @app.put("/tour/{id}")
 def update_by_id(id: int, post: Travel):
 
-    conn, cursor = get_db()
+    conn, cursor = get_psycopg_db()
 
     cursor.execute(
         """
