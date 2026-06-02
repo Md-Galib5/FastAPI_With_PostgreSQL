@@ -84,6 +84,30 @@ def get_country(id:int,db: Session = Depends(get_db)):
 
     return {"message": country}
 
+# update data by id using sqlalchemy
+
+@app.put("/SQLtour/{id}")
+def update_country_data(id: int,all_data: Travel,db: Session = Depends(get_db)):
+    country_query = db.query(model.Travel).filter(model.Travel.id == id)
+
+    country = country_query.first()
+
+    if country is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tour not found"
+        )
+
+    update_data = all_data.model_dump()
+
+    country_query.update(update_data, synchronize_session=False)
+
+    db.commit()
+
+    updated_country = country_query.first()
+
+    return {"Country details": updated_country}
+
 
 
 @app.get("/tour")
