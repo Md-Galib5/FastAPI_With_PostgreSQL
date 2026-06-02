@@ -48,6 +48,7 @@ def create_tour(post: Travel):
     return {"data": new_data}
 
 
+# post data using sqlalchemy
 @app.post("/SQLtour")
 def post_tour(post : Travel,db:Session = Depends(get_db)):
     new_tour = model.Travel(
@@ -61,7 +62,12 @@ def post_tour(post : Travel,db:Session = Depends(get_db)):
     db.refresh(new_tour)
     return {"Tour" : new_tour}
 
+# get data using sqlalchemy
 
+@app.get("/SQLtour")
+def country(db: Session = Depends(get_db)):
+    country = db.query(model.Travel).all()
+    return {"message": country}
 
 @app.get("/tour")
 def get_tours():
