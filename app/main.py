@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Depends
+from fastapi import FastAPI,Depends,HTTPException, status
 from pydantic import BaseModel
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -68,6 +68,23 @@ def post_tour(post : Travel,db:Session = Depends(get_db)):
 def country(db: Session = Depends(get_db)):
     country = db.query(model.Travel).all()
     return {"message": country}
+
+
+# get data by id using sqlalchemy
+
+@app.get("/SQLtour/{id}")
+def get_country(id:int,db: Session = Depends(get_db)):
+    country = db.query(model.Travel).filter(model.Travel.id == id).first()
+
+    if country is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tour not found"
+        )
+
+    return {"message": country}
+
+
 
 @app.get("/tour")
 def get_tours():
