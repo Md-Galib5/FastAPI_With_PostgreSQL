@@ -109,6 +109,27 @@ def update_country_data(id: int,all_data: Travel,db: Session = Depends(get_db)):
     return {"Country details": updated_country}
 
 
+# delete by id using sqlalchemy
+@app.delete("/SQLtour/{id}")
+def delete_country_data(id: int,db: Session = Depends(get_db)):
+    country_query = db.query(model.Travel).filter(model.Travel.id == id)
+
+    country = country_query.first()
+
+    if country is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tour not found"
+        )
+    country_query.delete(synchronize_session=False)
+
+    db.commit()
+
+    deleted_country = country_query.first()
+
+    return {"Country details": deleted_country}
+
+
 
 @app.get("/tour")
 def get_tours():
