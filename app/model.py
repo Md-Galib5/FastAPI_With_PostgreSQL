@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,Float
+from sqlalchemy import Column,Integer,String,TIMESTAMP,text
 from .database import Base
 
 class Travel(Base):
@@ -8,3 +8,19 @@ class Travel(Base):
     city = Column(String,nullable=False)
     duration = Column(Integer,nullable=False)
     cost = Column(Integer,nullable=False)
+
+
+class User(Base):
+    __tablename__ = "User"
+
+    id = Column(Integer, primary_key=True, index=True, nullable=False)
+
+    email = Column(String, nullable=False, unique=True)
+
+    password = Column(String, nullable=False)
+
+    created_at = Column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=text('now()')
+    )
