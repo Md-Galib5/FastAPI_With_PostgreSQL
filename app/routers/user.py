@@ -7,9 +7,12 @@ from .. import model,utils
 from ..database import engine, get_db
 from ..schemas import TravelCreate, TravelResponse,UserCreate,UserResponse
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/user",
+    tags=['Users']
+)
 
-@router.post("/sqluser", response_model=UserResponse)
+@router.post("/", response_model=UserResponse)
 def create_sql_user(
     post: UserCreate,
     db: Session = Depends(get_db)

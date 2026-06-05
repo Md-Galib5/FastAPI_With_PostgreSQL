@@ -7,9 +7,12 @@ from .. import model,utils
 from ..database import engine, get_db
 from ..schemas import TravelCreate, TravelResponse,UserCreate,UserResponse
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/tour",
+    tags=['Tour']
+)
 
-@router.post("/sqltour", response_model=TravelResponse)
+@router.post("/", response_model=TravelResponse)
 def create_sql_tour(
     post: TravelCreate,
     db: Session = Depends(get_db)
@@ -29,7 +32,7 @@ def create_sql_tour(
     return new_tour
 
 
-@router.get("/sqltour")
+@router.get("/")
 def get_sql_tours(db: Session = Depends(get_db)):
 
     tours = db.query(model.Travel).all()
@@ -37,7 +40,7 @@ def get_sql_tours(db: Session = Depends(get_db)):
     return tours
 
 
-@router.get("/sqltour/{id}")
+@router.get("/{id}")
 def get_sql_tour(id: int, db: Session = Depends(get_db)):
 
     tour = db.query(model.Travel).filter(
@@ -53,7 +56,7 @@ def get_sql_tour(id: int, db: Session = Depends(get_db)):
     return tour
 
 
-@router.put("/sqltour/{id}")
+@router.put("/{id}")
 def update_sql_tour(
     id: int,
     updated_data: TravelCreate,
@@ -82,7 +85,7 @@ def update_sql_tour(
     return tour_query.first()
 
 
-@router.delete("/sqltour/{id}")
+@router.delete("/{id}")
 def delete_sql_tour(
     id: int,
     db: Session = Depends(get_db)
@@ -105,9 +108,3 @@ def delete_sql_tour(
     db.commit()
 
     return {"message": "Tour deleted successfully"}
-
-
-@router.get("/")
-def home():
-
-    return {"message": "FastAPI is working"}
