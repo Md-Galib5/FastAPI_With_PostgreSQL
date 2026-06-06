@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status,APIRouter
 from sqlalchemy.orm import Session
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from .. import oauth2
 
 from .. import model,utils
 from ..database import engine, get_db
@@ -15,14 +16,17 @@ router = APIRouter(
 @router.post("/", response_model=TravelResponse)
 def create_sql_tour(
     post: TravelCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),current_user : model.User = Depends(oauth2.get_current_user)
 ):
+    print(current_user.email)
+    print(current_user.id)
 
     new_tour = model.Travel(
         name=post.name,
         city=post.city,
         duration=post.duration,
-        cost=post.cost
+        cost=post.cost,
+        creator_id = current_user.id
     )
 
     db.add(new_tour)
@@ -33,7 +37,8 @@ def create_sql_tour(
 
 
 @router.get("/")
-def get_sql_tours(db: Session = Depends(get_db)):
+def get_sql_tours(db: Session = Depends(get_db),current_user : model.User = Depends(oauth2.get_current_user)
+):
 
     tours = db.query(model.Travel).all()
 
@@ -41,7 +46,8 @@ def get_sql_tours(db: Session = Depends(get_db)):
 
 
 @router.get("/{id}")
-def get_sql_tour(id: int, db: Session = Depends(get_db)):
+def get_sql_tour(id: int, db: Session = Depends(get_db),current_user : model.User = Depends(oauth2.get_current_user)
+):
 
     tour = db.query(model.Travel).filter(
         model.Travel.id == id
@@ -60,7 +66,8 @@ def get_sql_tour(id: int, db: Session = Depends(get_db)):
 def update_sql_tour(
     id: int,
     updated_data: TravelCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+current_user : model.User = Depends(oauth2.get_current_user)
 ):
 
     tour_query = db.query(model.Travel).filter(
@@ -88,7 +95,7 @@ def update_sql_tour(
 @router.delete("/{id}")
 def delete_sql_tour(
     id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),current_user : model.User = Depends(oauth2.get_current_user)
 ):
 
     tour_query = db.query(model.Travel).filter(

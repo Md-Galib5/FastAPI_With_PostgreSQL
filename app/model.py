@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,TIMESTAMP,text
+from sqlalchemy import Column,Integer,String,TIMESTAMP,text,ForeignKey
 from .database import Base
 
 class Travel(Base):
@@ -8,6 +8,7 @@ class Travel(Base):
     city = Column(String,nullable=False)
     duration = Column(Integer,nullable=False)
     cost = Column(Integer,nullable=False)
+    creator_id = Column(Integer,ForeignKey("User.id",ondelete="CASCADE"),nullable=False)
 
 
 class User(Base):
